@@ -23,7 +23,7 @@ struct pos {
   int y;
 };
 
-unsigned char visited[MAP_HEIGHT][MAP_WIDTH];
+unsigned char visited[MAP_HEIGHT*2][MAP_WIDTH*2];
 struct pos poses[ROPE_LEN];
 int unique_positions = 0;
 
