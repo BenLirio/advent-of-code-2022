@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class Part1 {
+class P1 {
   public static void check(boolean v) {
     if (!v) {
       throw new RuntimeException("Assertion failed");
