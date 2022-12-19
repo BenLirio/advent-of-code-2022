@@ -53,7 +53,7 @@
 
 ;; ================ Main ================
 (defn Main []
-  (def input_string (slurp "input.txt"))
+  (def input_string (slurp "input_custom.txt"))
   (print (format "Solution: %d\n" (solve (parse input_string))))
 )
 
