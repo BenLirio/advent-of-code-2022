@@ -1,4 +1,4 @@
-(ns p1.core
+(ns p2t1
   (:require [clojure.string :as str])
   (:gen-class))
 
@@ -74,14 +74,15 @@
 
 (defn solve [points]
   (print (info-input points))
-  (let [[[x1 x2] [y1 y2] [z1 z2]] (points-bounds points)]
+  (let [[[x1 _] [y1 _] [z1 _]] (points-bounds points)]
     (let [[solution _] (solve-aux points (points-bounds points) #{} [(- x1 1) (- y1 1) (- z1 1)])]
       solution)))
 
 ;; ================ Main ================
 (defn Main []
-  (def input_string (slurp "input.txt"))
+  (let [input_string (slurp "input.txt")]
   (print (format "Solution: %d\n" (solve (parse input_string))))
+  )
 )
 
 (Main)

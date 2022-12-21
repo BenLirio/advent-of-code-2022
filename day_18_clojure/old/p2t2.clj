@@ -1,6 +1,5 @@
-(ns p2
-  (:require [clojure.set :as set]
-            [clojure.string :as str])
+(ns p2t2
+  (:require [clojure.string :as str])
   (:gen-class))
 
 ;; ================ Utils ================

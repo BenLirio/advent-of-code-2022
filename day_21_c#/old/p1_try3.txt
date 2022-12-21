@@ -1,0 +1,209 @@
+﻿public enum Operation {
+  Mul,
+  Add,
+  Div,
+  Sub
+}
+public struct Equation {
+  public string op0;
+  public string op1;
+  public Operation bop;
+}
+
+class OperationUtil {
+  public static Func<int, int, int> getOpFunc(Operation op) {
+    switch (op) {
+      case Operation.Mul:
+        return (a, b) => checked(a * b);
+      case Operation.Add:
+        return (a, b) => checked(a + b);
+      case Operation.Div:
+        return (a, b) => checked(a / b);
+      case Operation.Sub:
+        return (a, b) => checked(a - b);
+    }
+    throw new Exception("Invalid operation");
+  }
+}
+
+class SymbolTable {
+  public Dictionary<string, int> values;
+  public Dictionary<string, Equation> equations;
+  public SymbolTable() {
+    this.values = new Dictionary<string, int>();
+    this.equations = new Dictionary<string, Equation>();
+  }
+  public void addValue(string name, int value) {
+    this.values[name] = value;
+  }
+  public void resolveEquation(string name, int value) {
+    this.equations.Remove(name);
+    this.addValue(name, value);
+  }
+  public void rewriteEquation(string name, Equation eq) {
+    this.equations[name] = eq;
+  }
+  public void addEquation(string name, Equation eq) {
+    this.equations[name] = eq;
+  }
+  public void replaceOccurences(string of, string to) {
+    foreach (string id in this.equations.Keys) {
+      Equation eq = this.equations[id];
+      if (eq.op0 == of) eq.op0 = to;
+      if (eq.op1 == of) eq.op1 = to;
+      this.equations[id] = eq;
+    }
+  }
+  public void prune() {
+    Dictionary<string, bool> used = new Dictionary<string, bool>();
+    foreach (string id in this.equations.Keys) {
+      Equation eq = this.equations[id];
+      used[eq.op0] = true;
+      used[eq.op1] = true;
+    }
+    this.values = this.values.Where(kv => used.ContainsKey(kv.Key)).ToDictionary(kv => kv.Key, kv => kv.Value);
+  }
+}
+
+class Solver {
+  SymbolTable st;
+  int count = 0;
+
+  public string nextId() {
+    return "id" + this.count++;
+  }
+
+  public Solver(SymbolTable st) {
+    this.st = st;
+  }
+
+  public void simplifyConstants() {
+    Dictionary<int, string> valueMap = new Dictionary<int, string>();
+    foreach (string id in this.st.values.Keys) {
+      if (valueMap.ContainsKey(this.st.values[id])) {
+        this.st.replaceOccurences(id, valueMap[this.st.values[id]]);
+      } else {
+        valueMap[this.st.values[id]] = id;
+      }
+    }
+  }
+
+  public void cancelConstants(Func<int,bool> predicate) {
+    foreach (string id in this.st.equations.Keys) {
+      string op0 = this.st.equations[id].op0;
+      string op1 = this.st.equations[id].op1;
+      if (this.st.values.ContainsKey(op0) && this.st.values.ContainsKey(op1)) {
+        int v0 = this.st.values[op0];
+        int v1 = this.st.values[op1];
+        int v = OperationUtil.getOpFunc(this.st.equations[id].bop)(v0, v1);
+        if (predicate(v)) {
+          this.st.resolveEquation(id, v);
+        }
+     }
+    }
+  }
+
+  public Dictionary<string, bool> symbolsUsedBy(string id) {
+    Dictionary<string, bool> used = new Dictionary<string, bool>();
+    if (this.st.values.ContainsKey(id)) {
+      used[id] = true;
+    } else {
+      Dictionary<string, bool> lhsUsed = this.symbolsUsedBy(this.st.equations[id].op0);
+      Dictionary<string, bool> rhsUsed = this.symbolsUsedBy(this.st.equations[id].op1);
+      foreach (string k in lhsUsed.Keys) used[k] = true;
+      foreach (string k in rhsUsed.Keys) used[k] = true;
+    }
+    return used;
+  }
+
+  public void cancelSymbols() {
+    foreach (string id in this.st.equations.Keys) {
+      string op0 = this.st.equations[id].op0;
+      string op1 = this.st.equations[id].op1;
+      Operation bop = this.st.equations[id].bop;
+      if (bop == Operation.Div && this.st.equations.ContainsKey(op0) && this.st.values.ContainsKey(op1)) {
+        string op0op0 = this.st.equations[op0].op0;
+        string op0op1 = this.st.equations[op0].op1;
+        Operation op0bop = this.st.equations[op0].bop;
+        if (op0bop == Operation.Mul && (op0op0 == op1 || op0op1 == op1)) {
+          string zeroId = this.nextId();
+          this.st.addValue(zeroId, 0);
+          this.st.rewriteEquation(id, new Equation {
+            op0 = op1 == op0op0 ? op0op1 : op0op0,
+            op1 = zeroId,
+            bop = Operation.Add
+          });
+        }
+      }
+    }
+  }
+
+  public int evaluate(string id) {
+    int val;
+    if (this.st.values.TryGetValue(id, out val)) {
+      return val;
+    }
+    int v0 = this.evaluate(this.st.equations[id].op0);
+    int v1 = this.evaluate(this.st.equations[id].op1);
+    Console.WriteLine("{0} = {1} {2} {3}", id, v0, this.st.equations[id].bop, v1);
+    return OperationUtil.getOpFunc(this.st.equations[id].bop)(v0, v1);
+  }
+
+  public int solve() {
+    int prevCount = -1;
+    while (true) {
+      int count = this.st.equations.Count + this.st.values.Count;
+      if (count == prevCount) {
+        break;
+      }
+      prevCount = count;
+      Console.WriteLine(count);
+      this.simplifyConstants();
+      this.st.prune();
+      this.cancelConstants(v => v >= -2000 && v <= 2000);
+      this.st.prune();
+      this.simplifyConstants();
+      this.st.prune();
+      this.cancelSymbols();
+      this.st.prune();
+    }
+    return 0;
+    //return this.evaluate("root");
+  }
+}
+
+class P1 { static void Main() {
+  string[] lines = System.IO.File.ReadAllLines("input.txt");
+  Dictionary<string, string> eqsStr = lines.ToDictionary(l => l.Split(":")[0].Trim(), l => l.Split(":")[1].Trim());
+  SymbolTable st = new SymbolTable();
+  foreach (string id in eqsStr.Keys) {
+    int val;
+    if (int.TryParse(eqsStr[id], out val)) {
+      st.addValue(id, val);
+    } else {
+      string[] eqParts = eqsStr[id].Split(" ").Select(s => s.Trim()).ToArray();
+      string op0 = eqParts[0];
+      string op1 = eqParts[2];
+      Operation bop;
+      switch (eqParts[1]) {
+        case "*":
+          bop = Operation.Mul;
+          break;
+        case "+":
+          bop = Operation.Add;
+          break;
+        case "/":
+          bop = Operation.Div;
+          break;
+        case "-":
+          bop = Operation.Sub;
+          break;
+        default:
+          throw new Exception("Unknown operation");
+      }
+      st.addEquation(id, new Equation { op0 = op0, op1 = op1, bop = bop });
+    }
+  }
+  Solver solver = new Solver(st);
+  Console.WriteLine(solver.solve());
+} }

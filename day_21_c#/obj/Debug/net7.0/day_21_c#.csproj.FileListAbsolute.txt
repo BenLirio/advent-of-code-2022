@@ -1,0 +1,15 @@
+/home/ben/src/github.com/BenLirio/advent-of-code-2022/day_21_c#/bin/Debug/net7.0/day_21_c#
+/home/ben/src/github.com/BenLirio/advent-of-code-2022/day_21_c#/bin/Debug/net7.0/day_21_c#.deps.json
+/home/ben/src/github.com/BenLirio/advent-of-code-2022/day_21_c#/bin/Debug/net7.0/day_21_c#.runtimeconfig.json
+/home/ben/src/github.com/BenLirio/advent-of-code-2022/day_21_c#/bin/Debug/net7.0/day_21_c#.dll
+/home/ben/src/github.com/BenLirio/advent-of-code-2022/day_21_c#/bin/Debug/net7.0/day_21_c#.pdb
+/home/ben/src/github.com/BenLirio/advent-of-code-2022/day_21_c#/obj/Debug/net7.0/day_21_c#.csproj.AssemblyReference.cache
+/home/ben/src/github.com/BenLirio/advent-of-code-2022/day_21_c#/obj/Debug/net7.0/day_21_c#.GeneratedMSBuildEditorConfig.editorconfig
+/home/ben/src/github.com/BenLirio/advent-of-code-2022/day_21_c#/obj/Debug/net7.0/day_21_c#.AssemblyInfoInputs.cache
+/home/ben/src/github.com/BenLirio/advent-of-code-2022/day_21_c#/obj/Debug/net7.0/day_21_c#.AssemblyInfo.cs
+/home/ben/src/github.com/BenLirio/advent-of-code-2022/day_21_c#/obj/Debug/net7.0/day_21_c#.csproj.CoreCompileInputs.cache
+/home/ben/src/github.com/BenLirio/advent-of-code-2022/day_21_c#/obj/Debug/net7.0/day_21_c#.dll
+/home/ben/src/github.com/BenLirio/advent-of-code-2022/day_21_c#/obj/Debug/net7.0/refint/day_21_c#.dll
+/home/ben/src/github.com/BenLirio/advent-of-code-2022/day_21_c#/obj/Debug/net7.0/day_21_c#.pdb
+/home/ben/src/github.com/BenLirio/advent-of-code-2022/day_21_c#/obj/Debug/net7.0/day_21_c#.genruntimeconfig.cache
+/home/ben/src/github.com/BenLirio/advent-of-code-2022/day_21_c#/obj/Debug/net7.0/ref/day_21_c#.dll

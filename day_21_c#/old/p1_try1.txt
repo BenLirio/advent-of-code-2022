@@ -1,0 +1,85 @@
+﻿class Equation {
+  public string id;
+  public int val;
+  public bool evaluated;
+  public string? op0;
+  public string? op1;
+  public string? bop;
+  public Equation(string s) {
+    string[] parts = s.Split(":");
+    this.id = parts[0].Trim();
+    string eq = parts[1].Trim();
+    try {
+      this.val = int.Parse(eq);
+      this.evaluated = true;
+    } catch (FormatException) {
+      string[] eqParts = eq.Split(" ");
+      this.op0 = eqParts[0].Trim();
+      this.bop = eqParts[1].Trim();
+      this.op1 = eqParts[2].Trim();
+    }
+  }
+  public int evaluate(Dictionary<string, Equation> eqs) {
+    if (this.evaluated) return this.val;
+    int v0 = eqs[this.op0].evaluate(eqs);
+    int v1 = eqs[this.op1].evaluate(eqs);
+    switch (this.bop) {
+      case "*":
+        this.val = checked(v0 * v1);
+        break;
+      case "+":
+        this.val = checked(v0 + v1);
+        break;
+      case "/":
+        this.val = checked(v0 / v1);
+        break;
+      case "-":
+        this.val = checked(v0 - v1);
+        break;
+    }
+    this.evaluated = true;
+    return this.val;
+  }
+  public void simplifyAdd(Dictionary<string, Equation> eqs) {
+  }
+  public void simplifyMult(Dictionary<string, Equation> eqs) {
+
+  }
+  public void simplifyDiv(Dictionary<string, Equation> eqs) {
+
+  }
+  public void simplifySub(Dictionary<string, Equation> eqs) {
+  }
+  public void simplify(Dictionary<string, Equation> eqs) {
+    if (this.evaluated) return;
+    switch (this.bop) {
+      case "*":
+        this.simplifyMult(eqs);
+        break;
+      case "+":
+        this.simplifyAdd(eqs);
+        break;
+      case "/":
+        this.simplifyDiv(eqs);
+        break;
+      case "-":
+        this.simplifySub(eqs);
+        break;
+    }
+  }
+}
+class P1 {
+  public static void Main() {
+    string[] lines = System.IO.File.ReadAllLines("input.txt");
+    Dictionary<string, Equation> eqs = parse(lines);
+    //Console.WriteLine(eqs["root"].evaluate(eqs));
+  }
+  public static Dictionary<string, Equation> parse(string[] lines) {
+    Dictionary<string, Equation> eqs = new Dictionary<string, Equation>();
+    foreach (string line in lines) {
+      Equation eq = new Equation(line);
+      eqs.Add(eq.id, eq);
+    }
+    return eqs;
+  }
+}
